@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" style="height:100%">
     <background-scroller></background-scroller>
   </div>
 </template>
@@ -14,3 +14,7 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+  @import "./scss/styles.scss";
+</style>

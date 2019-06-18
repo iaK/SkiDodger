@@ -1,0 +1,101 @@
+export default {
+    methods: {
+        createEventListeners() {
+            window.addEventListener('keyup', this.upEvents);
+            window.addEventListener('keydown', this.downEvents);
+        },
+
+        downEvents(event) {
+            // KEY UP
+            if (event.keyCode == 38) this.pressUp();
+            // KEY DOWN
+            if (event.keyCode == 40) this.pressDown();
+            // KEY LEFT
+            if (event.keyCode == 37) this.pressLeft();
+            // KEY RIGHT
+            if (event.keyCode == 39) this.pressRight()
+        },
+        upEvents(event) {
+            // ENTER
+            if (event.keyCode == 13) {
+                if (this.preGame) {
+                    this.start();
+                } else if (this.endGame) {
+                    this.reset();
+                }
+            }
+
+            // SPACE
+            if (event.keyCode == 32) {
+                if (! this.endGame && ! this.preGame) {
+                    this.pause ? this.resume() : this.stop();
+                }
+            }
+
+            // KEY UP
+            if (event.keyCode == 38) {
+                this.upPress = false;
+                if (this.downPress) {
+                    this.pressDown();
+                } else {
+                    this.yDir = 0
+                }
+            }
+
+            // KEY DOWN
+            if (event.keyCode == 40) {
+                this.downPress = false;
+                if (this.upPress) {
+                    this.pressUp();
+                } else {
+                    this.yDir = 0
+                }
+            }
+
+            // KEY LEFT
+            if (event.keyCode == 37) {
+                this.leftPress = false;
+                if (this.rightPress) {
+                    this.pressRight()
+                } else {
+                    this.xDir = 0
+                }
+            }
+
+            // KEY RIGHT
+            if (event.keyCode == 39) {
+                this.rightPress = false;
+                if (this.leftPress) {
+                    this.pressLeft();
+                } else {
+                    this.xDir = 0
+                }
+            }
+
+            if (! this.leftPress && ! this.rightPress && ! this.upPress) this.boarder = this.$refs.boarder;
+        },
+
+        pressLeft() {
+            this.leftPress = true
+            if (! this.upPress) this.boarder = this.$refs.boarderLeft;
+            this.xDir = -12
+        },
+
+        pressRight() {
+            this.rightPress = true
+            if (! this.upPress) this.boarder = this.$refs.boarderRight;
+            this.xDir = 12
+        },
+
+        pressUp() {
+            this.upPress = true
+            this.boarder = this.$refs.boarderBack;
+            this.yDir = -12
+        },
+
+        pressDown() {
+            this.downPress = true
+            this.yDir = 12
+        },
+    }
+}

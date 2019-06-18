@@ -48,10 +48,18 @@
 </template>
 
 <script>
-    const uuid = require('uuid/v1');
+    import skiers from './Skiers.js';
+    import cloud from './Cloud.js';
+    import boarder from './Boarder.js';
+    import keyboardEvents from './KeyboardEvents.js';
+    import Vue from 'vue';
+
+    Vue.mixin(skiers);
+    Vue.mixin(cloud);
+    Vue.mixin(boarder);
+    Vue.mixin(keyboardEvents);
 
     export default {
-
         data() {
             return {
                 bestScore: 0,
@@ -60,10 +68,6 @@
                 c: null,
                 img: null,
                 boarder: null,
-                cloud1: null,
-                cloud2: null,
-                cloud3: null,
-                cloud4: null,
                 skiers: [],
                 skier: null,
                 velocity: 1000,
@@ -77,7 +81,6 @@
                 boarderPosY: 0,
                 xDir: 0,
                 yDir: 0,
-                clouds: [],
                 oneIn: 25,
                 score: 0,
                 stageInterval: null,
@@ -91,28 +94,13 @@
         mounted() {
             this.canvas = this.$refs.canvas;
             this.c = this.canvas.getContext('2d');
-            this.c.scale(2,2)
             this.img = this.$refs.img;
             this.boarder = this.$refs.boarder;
             this.skier = this.$refs.skier;
-            this.cloud1 = this.$refs.cloud1;
-            this.cloud2 = this.$refs.cloud2;
-            this.cloud3 = this.$refs.cloud3;
-            this.cloud4 = this.$refs.cloud4;
 
-            let dpi = window.devicePixelRatio;
-
-            let style_height =+ getComputedStyle(this.canvas).getPropertyValue("height").slice(0, -2);
-            let style_width =+ getComputedStyle(this.canvas).getPropertyValue("width").slice(0, -2);
-
-            this.canvas.setAttribute('height', style_height * dpi);
-            this.canvas.setAttribute('width', style_width * dpi);
-
-            window.addEventListener('keyup', this.upEvents);
-            window.addEventListener('keydown', this.downEvents);
-
-            this.boarderPosX = this.canvas.width / 2 - (this.boarder.width / 2)
-            this.boarderPosY = 40;
+            this.optimizeForRetina();
+            this.createEventListeners();
+            this.setBoarderStarterPos();
         },
 
         computed: {
@@ -120,105 +108,48 @@
                 if (this.leftPress || this.rightPress) {
                     return 60;
                 }
+
                 if (this.upPress) {
                     return 70;
                 }
+
                 return 30;
             },
+
             boarderHeight() {
                 return 80;
             },
+
             skierWidth() {
                 return 80;
             },
+
             skierHeight() {
                 return 100;
             }
         },
 
         methods: {
-            downEvents(event) {
-                if (event.keyCode == 38) {
-                    this.upPress = true
-                    this.boarder = this.$refs.boarderBack;
-                    this.yDir = -12
-                }
-                if (event.keyCode == 40) {
-                    this.downPress = true
-                    this.yDir = 12
-                }
-                if (event.keyCode == 37) {
-                    this.leftPress = true
-                    if (!this.upPress) {
-                        this.boarder = this.$refs.boarderLeft;
-                    }
-                    this.xDir = -12
-                }
-                if (event.keyCode == 39) {
-                    this.rightPress = true
-                    if (!this.upPress) {
-                        this.boarder = this.$refs.boarderRight;
-                    }
-                    this.xDir = 12
-                }
-            },
-            upEvents(event) {
-                if (event.keyCode == 13) {
-                    if (this.preGame) {
-                        this.start();
-                    } else if (this.endGame) {
-                        this.reset();
-                    }
-                }
-                if (event.keyCode == 32) {
-                    if (! this.endGame && ! this.preGame) {
-                        this.pause ? this.resume() : this.stop();
-                    }
-                }
-                if (event.keyCode == 38) {
-                    this.upPress = false;
-                    if (this.downPress) {
-                        this.yDir = 12;
-                    } else {
-                        this.yDir = 0
-                    }
-                }
-                if (event.keyCode == 40) {
-                    this.downPress = false;
-                    if (this.upPress) {
-                        this.boarder = this.$refs.boarderBack
-                        this.yDir = -12;
-                    } else {
-                        this.yDir = 0
-                    }
-                }
-                if (event.keyCode == 37) {
-                    this.leftPress = false;
-                    if (this.rightPress) {
-                        this.boarder = this.$refs.boarderRight
-                        this.xDir = 12;
-                    } else {
-                        this.xDir = 0
-                    }
-                }
-                if (event.keyCode == 39) {
-                    this.rightPress = false;
-                    if (this.leftPress) {
-                        this.boarder = this.$refs.boarderLeft
-                        this.xDir = -12;
-                    } else {
-                        this.xDir = 0
-                    }
-                }
+            optimizeForRetina() {
+                let dpi = window.devicePixelRatio;
 
-                if (!this.leftPress && !this.rightPress && !this.upPress) this.boarder = this.$refs.boarder;
+                let style_height =+ getComputedStyle(this.canvas).getPropertyValue("height").slice(0, -2);
+                let style_width =+ getComputedStyle(this.canvas).getPropertyValue("width").slice(0, -2);
+
+                this.c.scale(2,2)
+                this.canvas.setAttribute('height', style_height * dpi);
+                this.canvas.setAttribute('width', style_width * dpi);
             },
+
             calcOffset(time){
-                var frameGapTime = time - this.lastFrameRepaintTime;
+                let frameGapTime = time - this.lastFrameRepaintTime;
+                let translateX = this.velocity*(frameGapTime/1000);
+
                 this.lastFrameRepaintTime = time;
-                var translateX = this.velocity*(frameGapTime/1000);
+
                 return translateX;
             },
+
             reset() {
                 this.skiers = [];
                 this.clouds = [];
@@ -231,22 +162,40 @@
                 this.endGame = false;
                 this.start();
             },
+
             resume() {
                 this.pause = false,
                 this.start();
             },
+
             stop() {
                 this.pause = true;
                 clearInterval(this.stageInterval);
                 clearInterval(this.scoreInterval);
                 clearInterval(this.velocityInterval);
             },
+
             draw(time){
                 if (this.pause) {
                     return;
                 }
 
                 this.distance -= this.calcOffset(time);
+
+                this.drawBackground();
+                this.drawBoarder();
+                this.drawSkiers();
+                this.crashSkiers();
+                this.drawClouds();
+
+                if (this.shouldDrawSkier()) {
+                    this.addSkier();
+                }
+
+                requestAnimationFrame(this.draw);
+            },
+
+            drawBackground() {
                 if (this.distance < -this.canvas.height) this.distance = 0;
 
                 this.c.clearRect(0,0,this.canvas.width,this.canvas.height);
@@ -258,61 +207,35 @@
                 // Filler img
                 this.c.drawImage(this.img,0,0, this.img.width, this.img.height, 0,this.canvas.height-1, this.canvas.width, this.canvas.height);
                 this.c.restore();
-
-                this.drawBoarder();
-                if (this.randomInt(this.oneIn) >= this.oneIn - 1) {
-                    this.drawSkier();
-                }
-                this.drawSkiers();
-                this.drawClouds();
-
-                requestAnimationFrame(this.draw);
-
-            },
-
-            drawBoarder() {
-                this.boarderPosX += this.xDir;
-                if (this.boarderPosX < 0) this.boarderPosX = 0;
-                if (this.boarderPosX >= this.canvas.width - this.boarderWidth) this.boarderPosX = this.canvas.width - this.boarderWidth;
-
-                this.boarderPosY += this.yDir;
-                if (this.boarderPosY < 0) this.boarderPosY = 0;
-                if (this.boarderPosY > this.canvas.height - this.boarderHeight) this.boarderPosY = this.canvas.height - this.boarderHeight;
-
-                this.c.drawImage(this.boarder,0,0,this.boarder.width, this.boarder.height, this.boarderPosX, this.boarderPosY, this.boarderWidth, this.boarderHeight);
-                let collision = this.checkCollision(this.boarderPosX, this.boarderPosY, this.boarderWidth, this.boarderHeight)
-
-                if (collision.length) {
-                    this.loose();
-                }
             },
 
             loose() {
                 if (this.score > this.bestScore) {
                     this.bestScore = this.score;
                 }
+
                 this.pause = true;
                 this.endGame = true;
+
                 clearInterval(this.stageInterval);
                 clearInterval(this.scoreInterval);
                 clearInterval(this.velocityInterval);
             },
 
-            checkCollision(toCheckX, toCheckY, width, height) {
+            checkCollisions(toCheckX, toCheckY, width, height) {
                 return this.skiers.filter((skier) => {
-
                     if (
-                        this.col(toCheckX, toCheckY, skier)
-                        || this.col(toCheckX, toCheckY + height, skier)
-                        || this.col(toCheckX + width, toCheckY, skier)
-                        || this.col(toCheckX + width, toCheckY + height, skier)
+                        this.checkCollision(toCheckX, toCheckY, skier)
+                        || this.checkCollision(toCheckX, toCheckY + height, skier)
+                        || this.checkCollision(toCheckX + width, toCheckY, skier)
+                        || this.checkCollision(toCheckX + width, toCheckY + height, skier)
                     ) {
                         return true
                     }
                 })
             },
 
-            col(toCheckX, toCheckY, skier) {
+            checkCollision(toCheckX, toCheckY, skier) {
                 if (toCheckX > skier.x && toCheckX < skier.x + this.skierWidth) {
                     if (toCheckY  > skier.y && toCheckY < skier.y + this.skierHeight) {
                         return true;
@@ -322,122 +245,37 @@
                 return false
             },
 
-            drawSkier() {
-                let skier = {
-                    id: uuid(),
-                    x: this.randomInt(this.canvas.width),
-                    y:  this.canvas.height + this.randomInt(200),
-                    nextTurn: 20 + this.randomInt(20), turn: "left",
-                    xSpeed: 4 + this.randomInt(6),
-                    ySpeed: 4 + this.randomInt(14),
-                    crash: false,
-                }
-                this.skiers.push(skier);
-            },
-
-            drawLameSkiers() {
-                this.skiers.forEach((skier) => {
-                    this.c.drawImage(this.skier,0,0,this.skier.width, this.skier.height, skier.x, skier.y -this.distance, this.skierWidth, this.skierHeight);
-                })
-            },
-
-            drawSkiers() {
-                let collisions = [];
-                this.skiers = this.skiers.map((skier) => {
-                    let skierY = skier.crash ? skier.y - 25: skier.y;
-
-                    if (! skier.crash) {
-                        this.c.drawImage(this.skier,0,0,this.skier.width, this.skier.height, skier.x, skierY, this.skierWidth, this.skierHeight);
-                        if (skier.nextTurn == 0) {
-                            skier.turn = skier.turn == "left" ? "right" : "left";
-                            skier.nextTurn = 20 + this.randomInt(20)
-                        }
-
-                        if (skier.turn == "left") {
-                            skier.x -= skier.xSpeed
-                        } else {
-                            skier.x += skier.xSpeed
-                        }
-                        skier.nextTurn--
-                        skier.y -= skier.ySpeed;
-                    } else {
-                        skier.y = skierY;
-                    }
-
-                    if (! skier.crash) {
-                        let col = this.checkCollision(skier.x, skier.y, this.skierWidth, this.skierHeight);
-                        if (col.length) {
-                            if (this.randomInt(5) >= 4) {
-                                collisions.push(skier)
-                            } else {
-                                skier.nextTurn += 10;
-                                col[0].nextTurn += 10;
-                                skier.turn = skier.turn == 'left' ? 'right' : 'left';
-                                col[0].turn = col[0].turn == 'left' ? 'right' : 'left';
-                            }
-                        }
-                    }
-
-                    return skier;
-                }).filter((skier) => skier.y > -100)
-
-                this.crashSkiers(collisions);
-            },
-            crashSkiers(skiers) {
-                skiers = skiers.map(skier => skier.id);
-                this.skiers = this.skiers.map(skier => {
-                    if (skiers.includes(skier.id)) {
-                        this.addCloud(skier.x + this.skierWidth / 2, skier.y + this.skierHeight / 2);
-                        skier.crash = true;
-                    }
-
-                    return skier;
-                });
-            },
-
-            addCloud(x, y) {
-                this.clouds.push({x: x - 40,y:  y - 40, state: 1, count: 0})
-            },
-
-            drawClouds() {
-                this.clouds = this.clouds.map(cloud => {
-                    this.c.drawImage(this['cloud' + cloud.state],0,0,this['cloud' + cloud.state].width, this['cloud' + cloud.state].height, cloud.x, cloud.y, 160, 160);
-                    cloud.y -= 25
-                    if (cloud.y < 0) {
-                        return false
-                    }
-                    cloud.count++
-                    if(cloud.count >= 10) {
-                        cloud.state = cloud.state >= 4 ? 1 : cloud.state +1;
-                        cloud.count = 0;
-                    }
-                    return cloud
-                }).filter((cloud) => cloud)
-            },
-
             start(){
                 this.preGame = false;
-                this.stageInterval = setInterval(() => {
-                    if (this.pause) return;
-
-                    if (this.oneIn > 3) {
-                        this.oneIn--
-                    }
-                }, 20000)
-                this.scoreInterval = setInterval(() => {
-                    if (this.pause) return;
-                    this.score++
-                }, 100)
-                this.velocityInterval = setInterval(() => {
-                    this.velocity += 10
-                }, 2000)
+                this.stageInterval = setInterval(this.increaseNewSkierRate, 20000)
+                this.scoreInterval = setInterval(this.increaseScore, 100)
+                this.velocityInterval = setInterval(this.increaseVelocity, 2000)
 
                 this.lastFrameRepaintTime = window.performance.now();
                 requestAnimationFrame(this.draw);
             },
+
+            increaseNewSkierRate() {
+                if (this.pause) return;
+
+                if (this.oneIn > 3) {
+                    this.oneIn--
+                }
+            },
+
+            increaseScore() {
+                    if (this.pause) return;
+                    this.score++
+            },
+
+            increaseVelocity() {
+                this.velocity += 10
+            },
+
             randomInt(max) {
               return Math.floor(Math.random() * Math.floor(max));
             },
+
             randomIntBetween(min, max) {
                 return this.randomInt(max + min) + min
             }

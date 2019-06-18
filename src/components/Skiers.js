@@ -5,7 +5,23 @@ const uuid = require('uuid/v1');
 export default {
     data() {
         return {
+            skiers: [],
+            skier: null,
             collisions: [],
+        }
+    },
+
+    mounted() {
+        this.skier = this.$refs.skier;
+    },
+
+    computed: {
+        skierWidth() {
+            return 80;
+        },
+
+        skierHeight() {
+            return 100;
         }
     },
 
@@ -23,14 +39,14 @@ export default {
             });
         },
 
-        shouldDrawSkier() {
-            return this.randomInt(this.oneIn) >= this.oneIn - 1
+        maybeAddSkier() {
+            if (this.shouldDrawSkier()) {
+                this.addSkier();
+            }
         },
 
-        drawLameSkiers() {
-            this.skiers.forEach((skier) => {
-                this.c.drawImage(this.skier,0,0,this.skier.width, this.skier.height, skier.x, skier.y -this.distance, this.skierWidth, this.skierHeight);
-            })
+        shouldDrawSkier() {
+            return this.randomInt(this.oneIn) >= this.oneIn - 1
         },
 
         drawSkiers() {

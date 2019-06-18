@@ -1,4 +1,32 @@
 export default {
+    data() {
+        return {
+            boarder: null,
+            boarderPosX: 0,
+            boarderPosY: 0,
+            xDir: 0,
+            yDir: 0,
+        }
+    },
+
+    computed: {
+        boarderWidth() {
+            if (this.leftPress || this.rightPress) {
+                return 60;
+            }
+
+            if (this.upPress) {
+                return 70;
+            }
+
+            return 30;
+        },
+
+        boarderHeight() {
+            return 80;
+        },
+    },
+
     methods: {
         setBoarderStarterPos() {
             this.boarderPosX = this.canvas.width / 2 - (this.boarder.width / 2)

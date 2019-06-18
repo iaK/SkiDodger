@@ -1,8 +1,110 @@
 export default {
+    data() {
+        return {
+            leftPress: false,
+            rightPress: false,
+            upPress: false,
+            downPress: false,
+            firstOriantationEvent: true,
+            baseAlpha: 0,
+            baseBeta: 0,
+            baseGamma: 0,
+            tilt: false,
+        }
+    },
+
+    mounted() {
+        this.createEventListeners();
+    },
+
+    computed: {
+        portrait() {
+            return window.innerHeight > window.innerWidth
+        }
+    },
+
     methods: {
         createEventListeners() {
+            if (window.DeviceOrientationEvent) {
+                this.tilt = true;
+                window.addEventListener('deviceorientation', this.deviceOrientationHandler, false);
+            }
             window.addEventListener('keyup', this.upEvents);
             window.addEventListener('keydown', this.downEvents);
+        },
+
+        deviceOrientationHandler(event) {
+            console.log(this.portrait, event)
+            if (this.portrait) {
+                if (this.firstOriantationEvent) {
+                    this.baseAlpha = event.alpha;
+                    this.baseGamma = event.gamma;
+                    this.firstOriantationEvent = false;
+                }
+                if (event.alpha > this.calculateAlphaValue(this.baseAlpha + 20)) {
+                    this.leftPress = false;
+                    this.pressRight();
+                } else if (event.alpha < this.calculateAlphaValue(this.baseAlpha - 20)) {
+                    this.rightPress = false;
+                    this.pressLeft();
+                } else {
+                    this.leftPress = this.rightPress = false
+                    this.xDir = 0
+                }
+
+                if (event.gamma > this.baseGamma + 20) {
+                    this.upPress = false
+                    this.pressDown();
+                } else if (event.gamma < this.baseGamma -20) {
+                    this.downPress = false
+                    this.pressUp();
+                } else {
+                    this.downPress = this.upPress = false;
+                    this.yDir = 0;
+                }
+
+                if (! this.leftPress && ! this.rightPress && ! this.upPress) this.boarder = this.$refs.boarder;
+            } else {
+                if (this.firstOriantationEvent) {
+                    this.baseGamma = event.gamma;
+                    this.baseBeta = event.beta;
+                    this.firstOriantationEvent = false;
+                }
+                if (event.gamma > this.baseGamma + 20) {
+                    this.leftPress = false;
+                    this.pressRight();
+                } else if (event.gamma < this.baseGamma - 20) {
+                    this.rightPress = false;
+                    this.pressLeft();
+                } else {
+                    this.leftPress = this.rightPress = false
+                    this.xDir = 0
+                }
+
+                if (event.beta > this.baseBeta + 20) {
+                    this.upPress = false
+                    this.pressDown();
+                } else if (event.beta < this.baseBeta -20) {
+                    this.downPress = false
+                    this.pressUp();
+                } else {
+                    this.downPress = this.upPress = false;
+                    this.yDir = 0;
+                }
+
+                if (! this.leftPress && ! this.rightPress && ! this.upPress) this.boarder = this.$refs.boarder;
+            }
+        },
+
+        calculateAlphaValue(alpha) {
+            if (alpha > 360) {
+                return alpha - 360;
+            }
+            if (alpha < 360) {
+                return 360 - alpha;
+            }
+
+            return alpha;
         },
 
         downEvents(event) {

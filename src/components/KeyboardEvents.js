@@ -34,66 +34,65 @@ export default {
         },
 
         deviceOrientationHandler(event) {
-            console.log(this.portrait, event)
-            if (this.portrait) {
-                if (this.firstOriantationEvent) {
-                    this.baseAlpha = event.alpha;
-                    this.baseGamma = event.gamma;
-                    this.firstOriantationEvent = false;
-                }
-                if (event.alpha > this.calculateAlphaValue(this.baseAlpha + 20)) {
-                    this.leftPress = false;
-                    this.pressRight();
-                } else if (event.alpha < this.calculateAlphaValue(this.baseAlpha - 20)) {
-                    this.rightPress = false;
-                    this.pressLeft();
-                } else {
-                    this.leftPress = this.rightPress = false
-                    this.xDir = 0
-                }
-
-                if (event.gamma > this.baseGamma + 20) {
-                    this.upPress = false
-                    this.pressDown();
-                } else if (event.gamma < this.baseGamma -20) {
-                    this.downPress = false
-                    this.pressUp();
-                } else {
-                    this.downPress = this.upPress = false;
-                    this.yDir = 0;
-                }
-
-                if (! this.leftPress && ! this.rightPress && ! this.upPress) this.boarder = this.$refs.boarder;
-            } else {
-                if (this.firstOriantationEvent) {
-                    this.baseGamma = event.gamma;
-                    this.baseBeta = event.beta;
-                    this.firstOriantationEvent = false;
-                }
-                if (event.gamma > this.baseGamma + 20) {
-                    this.leftPress = false;
-                    this.pressRight();
-                } else if (event.gamma < this.baseGamma - 20) {
-                    this.rightPress = false;
-                    this.pressLeft();
-                } else {
-                    this.leftPress = this.rightPress = false
-                    this.xDir = 0
-                }
-
-                if (event.beta > this.baseBeta + 20) {
-                    this.upPress = false
-                    this.pressDown();
-                } else if (event.beta < this.baseBeta -20) {
-                    this.downPress = false
-                    this.pressUp();
-                } else {
-                    this.downPress = this.upPress = false;
-                    this.yDir = 0;
-                }
-
-                if (! this.leftPress && ! this.rightPress && ! this.upPress) this.boarder = this.$refs.boarder;
+            if (this.firstOriantationEvent) {
+                this.baseGamma = event.gamma;
+                this.baseBeta = event.beta;
+                this.baseAlpha = event.alpha;
+                this.firstOriantationEvent = false;
             }
+            this.portrait ? this.portraitDeviceOrientationHandler(event) : this.landscapeDeviceOrientationHandler(event);
+        },
+
+        portraitDeviceOrientationHandler(event) {
+            if (event.gamma > this.baseGamma + 20) {
+                this.leftPress = false;
+                this.pressRight();
+            } else if (event.gamma < this.baseGamma - 20) {
+                this.rightPress = false;
+                this.pressLeft();
+            } else {
+                this.leftPress = this.rightPress = false
+                this.xDir = 0
+            }
+
+            if (event.beta > this.baseBeta + 20) {
+                this.upPress = false
+                this.pressDown();
+            } else if (event.beta < this.baseBeta -20) {
+                this.downPress = false
+                this.pressUp();
+            } else {
+                this.downPress = this.upPress = false;
+                this.yDir = 0;
+            }
+
+            if (! this.leftPress && ! this.rightPress && ! this.upPress) this.boarder = this.$refs.boarder;
+        },
+
+        landscapeDeviceOrientationHandler(event) {
+            if (event.alpha > this.calculateAlphaValue(this.baseAlpha + 20)) {
+                this.leftPress = false;
+                this.pressRight();
+            } else if (event.alpha < this.calculateAlphaValue(this.baseAlpha - 20)) {
+                this.rightPress = false;
+                this.pressLeft();
+            } else {
+                this.leftPress = this.rightPress = false
+                this.xDir = 0
+            }
+
+            if (event.gamma > this.baseGamma + 20) {
+                this.upPress = false
+                this.pressDown();
+            } else if (event.gamma < this.baseGamma -20) {
+                this.downPress = false
+                this.pressUp();
+            } else {
+                this.downPress = this.upPress = false;
+                this.yDir = 0;
+            }
+
+            if (! this.leftPress && ! this.rightPress && ! this.upPress) this.boarder = this.$refs.boarder;
         },
 
         calculateAlphaValue(alpha) {

@@ -7,9 +7,14 @@
                 </div>
                 <div class="flex items-center justify-center h-full">
                     <div class="flex items-center flex-col text-center">
-                        <p class="text-black text:md sm:text-xl mb-4">Dodge the skiers and stay on the board!</p>
-                        <p class="text-black text:md sm:text-xl mb-8">Use arrow keys to control your rider</p>
-                        <img src="/arrows2.png" class="block" alt="">
+                        <p class="text-black text:md sm:text-xl mb-8">Dodge the skiers and stay on the board!</p>
+                        <div v-if="tilt">
+                            <p class="text-black text:md sm:text-xl mb-8">Tilt your device control your rider</p>
+                        </div>
+                        <div v-else>
+                            <p class="text-black text:md sm:text-xl mb-8">Use arrow keys to control your rider</p>
+                            <img src="/arrows2.png" class="block" alt="">
+                        </div>
                     </div>
                 </div>
                 <div class="absolute w-full pb-12 text-center" style="bottom: 0">
@@ -20,19 +25,19 @@
         </div>
         <div v-if="endGame" class="absolute w-full h-full flex items-center justify-center px-4" style="background-color: rgba(0,0,0,.7)">
             <div class="text-center">
-                <p class="text-white mb-2" style="font-size: 4rem">Game over</p>
-                <p class="text-white mb-6" style="font-size: 2rem">
+                <p class="text-white mb-4 sm:mb-2 text-3xl sm:text-5xl">Game over</p>
+                <p class="text-white mb-6 text-lg sm:text-xl">
                     <span v-if="score == bestScore">Highscore!!</span>
                     <span v-else>Score:</span>
                     {{ score }}
                 </p>
-                <p @click="reset" class="text-xl mt-2 text-white" style="font-size: 2rem">Retry?</p>
+                <p @click="reset" class="text-xl sm:text-2xl mt-2 text-white">Retry?</p>
             </div>
         </div>
-        <div v-if="bestScore && !endGame" class="absolute text-black" style="top: 10px; left: 15px; font-size: 1rem">
+        <div v-if="bestScore && !endGame" class="absolute text-black text-sm sm:text-xl" style="top: 10px; left: 15px;">
             Highscore:{{ bestScore }}
         </div>
-        <div v-if="!endGame && !preGame" class="absolute text-black" style="top: 10px; right: 15px; font-size: 4rem">
+        <div v-if="!endGame && !preGame" class="absolute text-black text-xl sm:text-3xl" style="top: 10px; right: 15px">
             {{ score }}
         </div>
         <canvas ref="canvas" id="canvas" style="width:100%; height:100%"></canvas>
@@ -134,6 +139,7 @@
                 this.boarderPosY = 40;
                 this.pause = false;
                 this.endGame = false;
+                this.firstOriantationEvent = true;
                 this.start();
             },
 

@@ -43,7 +43,7 @@ export default {
             this.portrait ? this.portraitDeviceOrientationHandler(event) : this.landscapeDeviceOrientationHandler(event);
         },
 
-        portraitDeviceOrientationHandler(event) {
+        landscapeDeviceOrientationHandler(event) {
             if (event.gamma > this.baseGamma + 20) {
                 this.leftPress = false;
                 this.pressRight();
@@ -69,7 +69,7 @@ export default {
             if (! this.leftPress && ! this.rightPress && ! this.upPress) this.boarder = this.$refs.boarder;
         },
 
-        landscapeDeviceOrientationHandler(event) {
+        portraitDeviceOrientationHandler(event) {
             if (event.alpha > this.calculateAlphaValue(this.baseAlpha + 20)) {
                 this.leftPress = false;
                 this.pressRight();

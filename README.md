@@ -1,29 +1,13 @@
-# snowboard
+# SkiDodger
+### A javascript game built in VueJs.
 
-## Project setup
-```
-yarn install
-```
+Get as far as you can down the slope without hitting the skiers.
 
-### Compiles and hot-reloads for development
-```
-yarn run serve
-```
+Supports navigation via keyboard & device orientation.
 
-### Compiles and minifies for production
+Use it yourself, clone repo and run
 ```
-yarn run build
+$ npm run build
 ```
 
-### Run your tests
-```
-yarn run test
-```
-
-### Lints and fixes files
-```
-yarn run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+Have fun! :)

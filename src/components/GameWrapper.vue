@@ -11,9 +11,9 @@
                         <div v-if="tilt">
                             <p class="text-black text:md sm:text-xl mb-8">Tilt your device control your rider</p>
                         </div>
-                        <div v-else>
+                        <div v-else class="text-center">
                             <p class="text-black text:md sm:text-xl mb-8">Use arrow keys to control your rider</p>
-                            <img src="/arrows2.png" class="block" alt="">
+                            <img src="/arrows2.png" class="inline-block" alt="">
                         </div>
                     </div>
                 </div>
@@ -21,8 +21,8 @@
                     <p class="text-black text-xl sm:text-4xl mb-4" @click="start" v-text="tilt ? 'Click here to start' : 'Press Enter to start'"></p>
                 </div>
             </div>
-
         </div>
+
         <div v-if="endGame" class="absolute w-full h-full flex items-center justify-center px-4" style="background-color: rgba(0,0,0,.7)">
             <div class="text-center">
                 <p class="text-white mb-4 sm:mb-2 text-3xl sm:text-5xl">Game over</p>
@@ -34,12 +34,15 @@
                 <p @click="reset" class="text-xl sm:text-2xl mt-2 text-white">Retry?</p>
             </div>
         </div>
+
         <div v-if="bestScore && !endGame" class="absolute text-black text-sm sm:text-xl" style="top: 10px; left: 15px;">
             Highscore:{{ bestScore }}
         </div>
+
         <div v-if="!endGame && !preGame" class="absolute text-black text-xl sm:text-3xl" style="top: 10px; right: 15px">
             {{ score }}
         </div>
+
         <canvas ref="canvas" id="canvas" style="width:100%; height:100%"></canvas>
         <img ref="img" src="/snow3.jpg" alt="" style="display: none">
         <img ref="boarder" src="/boarder.png" alt="" style="display: none">

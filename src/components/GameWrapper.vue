@@ -23,6 +23,10 @@
             </div>
         </div>
 
+        <div class="absolute bottom-0 right-0 pr-2 pb-2">
+            <p class="text-black text-xs">Made by <a href="https://github.com/iak">Isak Berglind</a></p>
+        </div>
+
         <div v-if="endGame" class="absolute w-full h-full flex items-center justify-center px-4" style="background-color: rgba(0,0,0,.7)">
             <div class="text-center">
                 <p class="text-white mb-4 sm:mb-2 text-3xl sm:text-5xl">Game over</p>

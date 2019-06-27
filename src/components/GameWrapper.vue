@@ -9,7 +9,7 @@
                     <div class="flex items-center flex-col text-center">
                         <p class="text-black text:md sm:text-xl mb-8">Dodge the skiers and stay on the board!</p>
                         <div v-if="tilt">
-                            <p class="text-black text:md sm:text-xl mb-8">Tilt your device control your rider</p>
+                            <p class="text-black text:md sm:text-xl mb-8">Tilt your device to control your rider</p>
                         </div>
                         <div v-else class="text-center">
                             <p class="text-black text:md sm:text-xl mb-8">Use arrow keys to control your rider</p>

@@ -26,7 +26,6 @@ export default {
     methods: {
         createEventListeners() {
             if (window.DeviceOrientationEvent) {
-                this.tilt = true;
                 window.addEventListener('deviceorientation', this.deviceOrientationHandler, false);
             }
             window.addEventListener('keyup', this.upEvents);
@@ -35,6 +34,7 @@ export default {
 
         deviceOrientationHandler(event) {
             if (this.firstOriantationEvent) {
+                this.tilt = true;
                 this.baseGamma = event.gamma;
                 this.baseBeta = event.beta;
                 this.baseAlpha = event.alpha;
